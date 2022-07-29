@@ -1,6 +1,11 @@
-import {AsyncBarrier} from './index'
+import {AsyncBarrier, AsyncBarrierSpace} from './AsyncBarrier'
 
 describe('AsyncBarrier tests', () => {
+  it('constructor', () => {
+    const ab1 = new AsyncBarrier();
+    const ab2 = new AsyncBarrier(1);
+    const ab3 = new AsyncBarrier('' as any);
+  });
   it('simple close case', async () => {
     const barrier = new AsyncBarrier();
 
@@ -56,11 +61,40 @@ describe('AsyncBarrier tests', () => {
       expect(error).not.toMatch('error');
     }
   });
+
+  it('Error reporting in opener does not prevent later programs from running', async () => {
+    const barrier = new AsyncBarrier(1);
+
+    const [opener] = await barrier.close();
+    const p = barrier.close();
+    try {
+      await opener(() => {
+        throw new Error();
+      });
+    } catch (error) {
+      expect(error).toBeInstanceOf(Error);
+    }
+    const [opener2] = await p;
+    // must can go here
+    expect(opener2).toBeInstanceOf(Function);
+  })
 })
 
 
 describe('AsyncBarrierSpace tests', () => {
-  it('TODO', async () => {
-    // TODO
+  it('simple case', async () => {
+    const abspace = new AsyncBarrierSpace();
+
+    try {
+      const [opener1, reset1] = await abspace.close();
+      expect(opener1).toBeInstanceOf(Function);
+      expect(reset1).toBeInstanceOf(Function);
+      opener1();
+      const [opener2, reset2] = await abspace.close();
+      expect(opener2).toBeInstanceOf(Function);
+      expect(reset2).toBeInstanceOf(Function);
+    } catch (error) {
+      expect(error).not.toMatch('error');
+    }
   });
 });

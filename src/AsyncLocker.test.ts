@@ -1,4 +1,5 @@
-import { AsyncLocker } from "./index";
+import { AsyncLocker } from "./AsyncLocker";
+import { NotHere } from "./misc.test";
 
 const randomDelay = () =>
   new Promise((r) => setTimeout(r, 100 * Math.random()));
@@ -42,7 +43,7 @@ describe("AsyncLocker tests", () => {
     for (let idx = 0; idx < 10; idx++) {
       locker.acquire("arr1", async_patch, idx);
     }
-
+    expect(locker.is_busy('arr1')).toBe(true);
     await locker.acquire("arr1");
     expect(arr1).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
   });
@@ -58,6 +59,7 @@ describe("AsyncLocker tests", () => {
     for (let idx = 0; idx < LEN; idx++) {
       locker.acquire(arr1, async_patch, idx);
     }
+    expect(locker.is_busy(arr1)).toBe(true);
     await locker.acquire(arr1);
     expect(arr1.length).toEqual(LEN);
   });
@@ -94,8 +96,25 @@ describe("AsyncLocker tests", () => {
         });
       });
       await locker.acquire("name");
+      NotHere();
     } catch (error) {
       expect(error).toBeInstanceOf(AsyncLocker.AsyncLockerReentrantError);
+    }
+  });
+
+  it("acquire key must not be boolean type", async () => {
+    const locker = new AsyncLocker();
+    try {
+      await locker.acquire(true);
+      NotHere();
+    } catch (error) {
+      expect(error).toBeInstanceOf(AsyncLocker.AsyncLockerKeyError);
+    }
+    try {
+      locker.is_busy(true);
+      NotHere();
+    } catch (error) {
+      expect(error).toBeInstanceOf(AsyncLocker.AsyncLockerKeyError);
     }
   });
 });

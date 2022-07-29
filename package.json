@@ -26,6 +26,7 @@
   },
   "scripts": {
     "build": "rm -rf ./dist/**/* && rollup -c",
-    "test": "jest"
+    "test": "jest",
+    "test:cover": "jest --coverage"
   }
 }

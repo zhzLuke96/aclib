@@ -1,6 +1,5 @@
-import {
-  AsyncSignal
-} from "./index";
+import { AsyncSignal } from "./AsyncSignal";
+import { NotHere } from "./misc.test";
 
 describe("AsyncSignal test", () => {
   it("AsyncSignal instanceof Promise", async () => {
@@ -24,17 +23,25 @@ describe("AsyncSignal test", () => {
       .catch((err) => expect(err).toBe(22));
   });
   it("Promise all", async () => {
-    const signals = [new AsyncSignal<number>(),new AsyncSignal<number>(),new AsyncSignal<number>()];
+    const signals = [
+      new AsyncSignal<number>(),
+      new AsyncSignal<number>(),
+      new AsyncSignal<number>(),
+    ];
 
     setTimeout(() => {
-      signals.forEach(sig => sig.resolve(1));
-    })
+      signals.forEach((sig) => sig.resolve(1));
+    });
     const resolved = await AsyncSignal.all(signals);
 
-    expect(resolved).toEqual([1,1,1]);
+    expect(resolved).toEqual([1, 1, 1]);
   });
   it("Promise race", async () => {
-    const signals = [new AsyncSignal<number>(),new AsyncSignal<number>(),new AsyncSignal<number>()];
+    const signals = [
+      new AsyncSignal<number>(),
+      new AsyncSignal<number>(),
+      new AsyncSignal<number>(),
+    ];
 
     setTimeout(() => {
       signals[2].resolve(2);
@@ -42,13 +49,17 @@ describe("AsyncSignal test", () => {
     setTimeout(() => {
       signals[1].resolve(1);
       signals[0].resolve(1);
-    }, 1000)
+    }, 1000);
     const resolved = await AsyncSignal.race(signals);
 
     expect(resolved).toEqual(2);
   });
   it("Promise race", async () => {
-    const signals = [new AsyncSignal<number>(),new AsyncSignal<number>(),new AsyncSignal<number>()];
+    const signals = [
+      new AsyncSignal<number>(),
+      new AsyncSignal<number>(),
+      new AsyncSignal<number>(),
+    ];
 
     setTimeout(() => {
       signals[2].resolve(2);
@@ -56,13 +67,17 @@ describe("AsyncSignal test", () => {
     setTimeout(() => {
       signals[1].resolve(1);
       signals[0].resolve(1);
-    }, 1000)
+    }, 1000);
     const resolved = await AsyncSignal.race(signals);
 
     expect(resolved).toEqual(2);
   });
   it("Promise any, success", async () => {
-    const signals = [new AsyncSignal<number>(),new AsyncSignal<number>(),new AsyncSignal<number>()];
+    const signals = [
+      new AsyncSignal<number>(),
+      new AsyncSignal<number>(),
+      new AsyncSignal<number>(),
+    ];
 
     const aErr = new Error();
     setTimeout(() => {
@@ -71,13 +86,17 @@ describe("AsyncSignal test", () => {
     }, 1);
     setTimeout(() => {
       signals[0].resolve(1);
-    }, 1000)
+    }, 1000);
     const resolved = await AsyncSignal.any(signals);
 
     expect(resolved).toEqual(1);
   });
   it("Promise any, all fail", async () => {
-    const signals = [new AsyncSignal<number>(),new AsyncSignal<number>(),new AsyncSignal<number>()];
+    const signals = [
+      new AsyncSignal<number>(),
+      new AsyncSignal<number>(),
+      new AsyncSignal<number>(),
+    ];
 
     const aErr = new Error();
     setTimeout(() => {
@@ -86,12 +105,11 @@ describe("AsyncSignal test", () => {
     }, 1);
     setTimeout(() => {
       signals[0].reject(aErr);
-    }, 1000)
+    }, 1000);
 
     try {
       await AsyncSignal.any(signals);
-      // not here
-      expect(1).toBe(0);
+      NotHere();
     } catch (error) {
       expect(error).toBeInstanceOf(AggregateError);
     }
@@ -107,15 +125,36 @@ describe("AsyncSignal test", () => {
   it("AsyncSignal reject", async () => {
     const signal = new AsyncSignal();
 
-    const err = new Error('AsyncSignal Rejected');
+    const err = new Error("AsyncSignal Rejected");
     setTimeout(() => {
       signal.reject(err);
     }, 1);
 
     try {
       await signal;
+      NotHere();
     } catch (error) {
       expect(error).toEqual(err);
     }
+  });
+  it("spread case", async () => {
+    const s1 = new AsyncSignal();
+    const [resolve] = s1.spread();
+    setTimeout(resolve);
+    await s1;
+
+    const s2 = new AsyncSignal();
+    const [, reject] = s2.spread();
+    setTimeout(() => reject(new Error()));
+    try {
+      await s2;
+      NotHere();
+    } catch (error) {
+      expect(error).toBeInstanceOf(Error);
+    }
+  });
+  it("to string tag", () => {
+    const s1 = new AsyncSignal();
+    expect(`${s1}`).toEqual("[object AsyncSignal]");
   });
 });
