@@ -109,6 +109,7 @@ describe("AsyncWindowSpace tests", () => {
     expect(w1.queue_size(ns)).toBe(0);
 
     // default ns
+    w1.ensure_window(undefined, { max_size: 5 });
     expect(w1.is_busy()).toBe(false);
     expect(w1.is_empty()).toBe(true);
     expect(w1.size()).toBe(0);

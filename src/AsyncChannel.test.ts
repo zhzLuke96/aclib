@@ -59,13 +59,13 @@ describe("AsyncChannel tests", () => {
       await ch1.send(1);
       NotHere();
     } catch (error) {
-      expect(error).toBeInstanceOf(AsyncChannel.AsyncChannelCloseError);
+      expect(error).toBeInstanceOf(AsyncChannel.CloseError);
     }
     try {
       await ch1.recv();
       NotHere();
     } catch (error) {
-      expect(error).toBeInstanceOf(AsyncChannel.AsyncChannelCloseError);
+      expect(error).toBeInstanceOf(AsyncChannel.CloseError);
     }
   });
 });

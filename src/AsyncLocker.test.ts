@@ -98,7 +98,7 @@ describe("AsyncLocker tests", () => {
       await locker.acquire("name");
       NotHere();
     } catch (error) {
-      expect(error).toBeInstanceOf(AsyncLocker.AsyncLockerReentrantError);
+      expect(error).toBeInstanceOf(AsyncLocker.ReentrantError);
     }
   });
 
@@ -108,13 +108,13 @@ describe("AsyncLocker tests", () => {
       await locker.acquire(true);
       NotHere();
     } catch (error) {
-      expect(error).toBeInstanceOf(AsyncLocker.AsyncLockerKeyError);
+      expect(error).toBeInstanceOf(AsyncLocker.KeyError);
     }
     try {
       locker.is_busy(true);
       NotHere();
     } catch (error) {
-      expect(error).toBeInstanceOf(AsyncLocker.AsyncLockerKeyError);
+      expect(error).toBeInstanceOf(AsyncLocker.KeyError);
     }
   });
 });

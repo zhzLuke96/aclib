@@ -1,8 +1,7 @@
+export const NotHere = () => expect("").toMatch(`Code should not run here`);
 
-export const NotHere = () => expect(true).toBe(false);
-
-describe('misc tests', () => {
-  it('noop', () => {
+describe("misc tests", () => {
+  it("noop", () => {
     // noop
   });
 });

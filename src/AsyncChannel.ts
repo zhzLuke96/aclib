@@ -1,12 +1,14 @@
 import { AsyncSignal } from "./AsyncSignal";
 
-class AsyncChannelCloseError extends Error {}
+class CloseError extends Error {
+  constructor(){super("channel is closed")}
+}
 
 /**
  * communicating sequential processes
  */
 export class AsyncChannel<T = unknown> {
-  static AsyncChannelCloseError = AsyncChannelCloseError;
+  static CloseError = CloseError;
 
   private buffer_queue = [] as AsyncSignal<T>[];
   private send_queue = [] as AsyncSignal[];
@@ -37,7 +39,7 @@ export class AsyncChannel<T = unknown> {
 
   async send(val: T) {
     if (this._closed) {
-      throw new AsyncChannelCloseError("this channel is closed");
+      throw new AsyncChannel.CloseError();
     }
 
     const buffer = new AsyncSignal<T>();
@@ -64,7 +66,7 @@ export class AsyncChannel<T = unknown> {
 
   recv(): AsyncSignal<T> {
     if (this._closed) {
-      throw new AsyncChannelCloseError("this channel is closed");
+      throw new AsyncChannel.CloseError();
     }
 
     let ret: AsyncSignal<T>;

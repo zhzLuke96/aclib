@@ -48,13 +48,22 @@ class SymbolMap<VALUE> {
   }
 }
 
-class AsyncLockerReentrantError extends Error {}
-class AsyncLockerKeyError extends Error {}
+class ReentrantError extends Error {
+  constructor(key:string){
+    super(`this locker is not reentrant, but duplicate acquire [${key}]`)
+  }
+}
+
+class KeyError extends Error {
+  constructor(){
+    super('acquire key not should be boolean type')
+  }
+}
 
 type AnyFunc<ARGS extends unknown[], RET> = (...args: ARGS) => RET;
 export class AsyncLocker {
-  static AsyncLockerReentrantError = AsyncLockerReentrantError;
-  static AsyncLockerKeyError = AsyncLockerKeyError;
+  static ReentrantError = ReentrantError;
+  static KeyError = KeyError;
 
   private domain_storage = new AsyncLocalStorage<string[]>();
 
@@ -64,7 +73,7 @@ export class AsyncLocker {
 
   is_busy(key: any) {
     if (typeof key === 'boolean') {
-      throw new AsyncLockerKeyError('acquire key must not be boolean type');
+      throw new AsyncLocker.KeyError();
     }
     return this.queues.has(key);
   }
@@ -79,7 +88,7 @@ export class AsyncLocker {
     ...args: ARGS
   ): Promise<Awaited<RET>> {
     if (typeof key === 'boolean') {
-      throw new AsyncLockerKeyError('acquire key must not be boolean type');
+      throw new KeyError();
     }
 
     const domain = this.domain_storage.getStore() || [];
@@ -87,9 +96,7 @@ export class AsyncLocker {
     domain.push(key);
 
     if (!this.reentrant && domain_included) {
-      throw new AsyncLocker.AsyncLockerReentrantError(
-        `this locker is not reentrant, but duplicate acquire [${key}]`
-      );
+      throw new AsyncLocker.ReentrantError(key);
     }
 
     let queue = this.queue(key);

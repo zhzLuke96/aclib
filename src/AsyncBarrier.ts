@@ -31,6 +31,7 @@ export class AsyncBarrier {
       timer = setTimeout(() => {
         opener();
         timer = null;
+        // TODO maybe need timeout error or timeout callback
       }, timeout_ms);
     };
 
@@ -63,7 +64,7 @@ export class AsyncBarrierSpace {
 
   constructor(readonly DEF_KEY = "default") {}
 
-  private ensure_barrier(key = this.DEF_KEY) {
+  private ensure_barrier(key: string) {
     let barrier = this.barriers.get(key);
     if (!barrier) {
       barrier = new AsyncBarrier();
