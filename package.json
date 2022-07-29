@@ -1,7 +1,7 @@
 {
-  "name": "aclib",
+  "name": "@zzkit/aclib",
   "version": "0.0.1",
-  "main": "index.js",
+  "main": "dist/index.js",
   "repository": "https://github.com/zhzLuke96/aclib",
   "author": "zhzluke96 <o2g.luke@outlook.com>",
   "license": "MIT",

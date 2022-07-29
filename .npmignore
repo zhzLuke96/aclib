@@ -40,3 +40,5 @@ prettier.config.js
 *.html
 .node-version
 .editorconfig
+*.config.js
+.npmignore
