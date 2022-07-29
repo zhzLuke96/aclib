@@ -29,6 +29,7 @@
     "build": "rm -rf ./dist/**/* && rollup -c",
     "test": "jest",
     "test:cover": "jest --coverage",
-    "lint": "eslint . --ext .ts"
+    "lint": "eslint . --ext .ts",
+    "prepublishOnly": "yarn test && yarn build"
   }
 }
