@@ -43,6 +43,7 @@ export class AsyncChannel<T = unknown> {
     const buffer = new AsyncSignal<T>();
     buffer.resolve(val);
 
+    // eslint-disable-next-line no-constant-condition
     while (1) {
       const receiver = this.recv_queue.shift();
       if (receiver) {

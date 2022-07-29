@@ -22,13 +22,16 @@ export class AsyncBarrier {
     }
     this.running = true;
 
-    let timer: any = 0;
+    let timer: NodeJS.Timeout | null = null;
     const reset = () => {
       if (timeout_ms < 0) {
         return;
       }
-      clearTimeout(timer);
-      timer = setTimeout(opener, timeout_ms);
+      timer && clearTimeout(timer);
+      timer = setTimeout(() => {
+        opener();
+        timer = null;
+      }, timeout_ms);
     };
 
     const opener = () => {
@@ -58,7 +61,7 @@ export class AsyncBarrier {
 export class AsyncBarrierSpace {
   private barriers = new Map<string, AsyncBarrier>();
 
-  constructor(readonly DEF_KEY = 'default') {}
+  constructor(readonly DEF_KEY = "default") {}
 
   private ensure_barrier(key = this.DEF_KEY) {
     let barrier = this.barriers.get(key);

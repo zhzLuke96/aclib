@@ -67,13 +67,16 @@ export class AsyncWindow {
       const signal = this.queue.shift();
       signal?.resolve(void 0);
     };
-    let timer: any = 0;
+    let timer: NodeJS.Timeout | null = null;
     const reset = () => {
       if (this.params.timeout_ms < 0) {
         return;
       }
-      clearTimeout(timer);
-      timer = setTimeout(leave, this.params.timeout_ms);
+      timer && clearTimeout(timer);
+      timer = setTimeout(() => {
+        leave();
+        timer = null;
+      }, this.params.timeout_ms);
     };
     reset();
     return [leave, reset] as const;

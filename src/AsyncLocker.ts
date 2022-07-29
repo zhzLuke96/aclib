@@ -1,48 +1,47 @@
 import { AsyncLocalStorage } from "async_hooks";
 import { AsyncSignal } from "./AsyncSignal";
 
+const is_ref_key = (key: unknown) => {
+  return (
+    typeof key === "object" &&
+    typeof key !== "string" &&
+    !(key instanceof String) &&
+    typeof key !== "number" &&
+    !(key instanceof Number) &&
+    typeof key !== "symbol" &&
+    typeof key !== "boolean"
+  );
+}
 /**
  * The key can be a string, a number, a symbol, or a reference to an object
  */
 class SymbolMap<VALUE> {
   private smap = new Map<keyof any, VALUE>();
-  private wmap = new WeakMap<Object, VALUE>();
-
-  private is_ref_key(key: any) {
-    return (
-      typeof key === "object" &&
-      typeof key !== "string" &&
-      !(key instanceof String) &&
-      typeof key !== "number" &&
-      !(key instanceof Number) &&
-      typeof key !== "symbol" &&
-      typeof key !== "boolean"
-    );
-  }
+  private wmap = new WeakMap<any, VALUE>();
 
   has(key: any) {
-    if (this.is_ref_key(key)) {
+    if (is_ref_key(key)) {
       return this.wmap.has(key);
     }
     return this.smap.has(key);
   }
 
   get(key: any) {
-    if (this.is_ref_key(key)) {
+    if (is_ref_key(key)) {
       return this.wmap.get(key);
     }
     return this.smap.get(key);
   }
 
   set(key: any, val: VALUE) {
-    if (this.is_ref_key(key)) {
+    if (is_ref_key(key)) {
       return this.wmap.set(key, val);
     }
     return this.smap.set(key, val);
   }
 
   del(key: any) {
-    if (this.is_ref_key(key)) {
+    if (is_ref_key(key)) {
       return this.wmap.get(key);
     }
     return this.smap.get(key);
