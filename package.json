@@ -5,15 +5,13 @@
   "repository": "https://github.com/zhzLuke96/aclib",
   "author": "zhzluke96 <o2g.luke@outlook.com>",
   "license": "MIT",
-  "dependencies": {
-    "@types/node": "^18.6.2",
-    "nodemon": "^2.0.19",
+  "devDependencies": {
+    "tslib": "^2.4.0",
+    "typescript": "^4.7.4",
     "rollup-plugin-dts": "^4.2.2",
     "ts-node": "^10.9.1",
-    "tslib": "^2.4.0",
-    "typescript": "^4.7.4"
-  },
-  "devDependencies": {
+    "nodemon": "^2.0.19",
+    "@types/node": "^18.6.2",
     "@babel/preset-env": "^7.18.9",
     "@babel/preset-typescript": "^7.18.6",
     "@types/jest": "^28.1.6",
