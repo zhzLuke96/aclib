@@ -45,15 +45,13 @@ describe('AsyncBarrier tests', () => {
   });
 
   it('timeout reset', async () => {
-    const barrier = new AsyncBarrier(1000);
+    const barrier = new AsyncBarrier(500);
 
     const start_time = Date.now();
     try {
       const [, reset] = await barrier.close();
-      setTimeout(reset, 500);
-      setTimeout(reset, 1000);
-      setTimeout(reset, 1500);
-      setTimeout(reset, 2000);
+      setTimeout(reset, 300);
+      setTimeout(reset, 600);
       await barrier.close();
       const cast_time = Date.now() - start_time;
       expect(cast_time).toBeGreaterThan(1005);
@@ -90,6 +88,21 @@ describe('AsyncBarrierSpace tests', () => {
       expect(opener1).toBeInstanceOf(Function);
       expect(reset1).toBeInstanceOf(Function);
       opener1();
+      const [opener2, reset2] = await abspace.close();
+      expect(opener2).toBeInstanceOf(Function);
+      expect(reset2).toBeInstanceOf(Function);
+    } catch (error) {
+      expect(error).not.toMatch('error');
+    }
+  });
+
+  it('simple case with timeout', async () => {
+    const abspace = new AsyncBarrierSpace(undefined, 100);
+
+    try {
+      const [opener1, reset1] = await abspace.close();
+      expect(opener1).toBeInstanceOf(Function);
+      expect(reset1).toBeInstanceOf(Function);
       const [opener2, reset2] = await abspace.close();
       expect(opener2).toBeInstanceOf(Function);
       expect(reset2).toBeInstanceOf(Function);

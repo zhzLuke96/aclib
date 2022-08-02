@@ -78,10 +78,6 @@ export class AsyncLocker {
     return this.queues.has(key);
   }
 
-  private queue(key: any) {
-    return this.queues.get(key);
-  }
-
   async acquire<ARGS extends unknown[], RET>(
     key: any,
     func?: AnyFunc<ARGS, RET>,
@@ -99,7 +95,7 @@ export class AsyncLocker {
       throw new AsyncLocker.ReentrantError(key);
     }
 
-    let queue = this.queue(key);
+    let queue = this.queues.get(key);
     const busy = !!queue && !domain_included;
 
     if (!busy) {

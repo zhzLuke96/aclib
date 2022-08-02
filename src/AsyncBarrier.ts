@@ -62,19 +62,22 @@ export class AsyncBarrier {
 export class AsyncBarrierSpace {
   private barriers = new Map<string, AsyncBarrier>();
 
-  constructor(readonly DEF_KEY = "default") {}
+  constructor(
+    private readonly DEF_KEY = "default",
+    private readonly DEF_TIMEOUT = 0
+  ) {}
 
-  private ensure_barrier(key: string) {
+  private ensure_barrier(key: string, timeout_ms: number) {
     let barrier = this.barriers.get(key);
     if (!barrier) {
-      barrier = new AsyncBarrier();
+      barrier = new AsyncBarrier(timeout_ms);
       this.barriers.set(key, barrier);
     }
     return barrier;
   }
 
-  async close(key = this.DEF_KEY) {
-    const barrier = this.ensure_barrier(key);
+  async close(key = this.DEF_KEY, timeout_ms = this.DEF_TIMEOUT) {
+    const barrier = this.ensure_barrier(key, timeout_ms);
     return await barrier.close();
   }
 }
