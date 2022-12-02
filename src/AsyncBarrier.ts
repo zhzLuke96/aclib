@@ -1,5 +1,8 @@
 import { AsyncSignal } from "./AsyncSignal";
 
+/**
+ * Restrict some code runs and force the code not to run in parallel
+ */
 export class AsyncBarrier {
   private signals = [] as AsyncSignal[];
   private running = false;
@@ -12,6 +15,8 @@ export class AsyncBarrier {
 
   /**
    * close barrier
+   * @returns[0] runner
+   * @returns[1] reset timeout
    */
   async close() {
     const { timeout_ms, running } = this;
@@ -76,6 +81,11 @@ export class AsyncBarrierSpace {
     return barrier;
   }
 
+  /**
+   * close barrier
+   * @returns[0] runner
+   * @returns[1] reset timeout
+   */
   async close(key = this.DEF_KEY, timeout_ms = this.DEF_TIMEOUT) {
     const barrier = this.ensure_barrier(key, timeout_ms);
     return await barrier.close();

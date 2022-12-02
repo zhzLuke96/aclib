@@ -11,7 +11,7 @@ const is_ref_key = (key: unknown) => {
     typeof key !== "symbol" &&
     typeof key !== "boolean"
   );
-}
+};
 /**
  * The key can be a string, a number, a symbol, or a reference to an object
  */
@@ -42,25 +42,32 @@ class SymbolMap<VALUE> {
 
   del(key: any) {
     if (is_ref_key(key)) {
-      return this.wmap.get(key);
+      return this.wmap.delete(key);
     }
-    return this.smap.get(key);
+    return this.smap.delete(key);
   }
 }
 
 class ReentrantError extends Error {
-  constructor(key:string){
-    super(`this locker is not reentrant, but duplicate acquire [${key}]`)
+  constructor(key: string) {
+    super(`this locker is not reentrant, but duplicate acquire [${key}]`);
   }
 }
 
 class KeyError extends Error {
-  constructor(){
-    super('acquire key not should be boolean type')
+  constructor() {
+    super("acquire key not should be boolean type");
   }
 }
 
 type AnyFunc<ARGS extends unknown[], RET> = (...args: ARGS) => RET;
+/**
+ * Protects the timing of resource usage, prevents resource seizure,
+ * and continues with the next one after the previous transaction
+ * has finished.
+ *
+ * And allows nested use of resources based on async_hooks.
+ */
 export class AsyncLocker {
   static ReentrantError = ReentrantError;
   static KeyError = KeyError;
@@ -72,7 +79,7 @@ export class AsyncLocker {
   constructor(readonly reentrant = true) {}
 
   is_busy(key: any) {
-    if (typeof key === 'boolean') {
+    if (typeof key === "boolean") {
       throw new AsyncLocker.KeyError();
     }
     return this.queues.has(key);
@@ -83,7 +90,7 @@ export class AsyncLocker {
     func?: AnyFunc<ARGS, RET>,
     ...args: ARGS
   ): Promise<Awaited<RET>> {
-    if (typeof key === 'boolean') {
+    if (typeof key === "boolean") {
       throw new KeyError();
     }
 

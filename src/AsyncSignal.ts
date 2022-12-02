@@ -1,4 +1,6 @@
-
+/**
+ * Exactly equal to Promise<T> but has resolve/reject methods
+ */
 export class AsyncSignal<T = unknown> extends Promise<T> {
   static all<T extends readonly unknown[] | []>(values: T) {
     return Promise.all(values);

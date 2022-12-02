@@ -10,6 +10,9 @@ type AsyncWindowParams = {
   };
 };
 
+/**
+ * Limit some code runs and control the amount of parallelism
+ */
 export class AsyncWindow {
   private params: AsyncWindowParams;
   private _size = 0;
@@ -21,7 +24,7 @@ export class AsyncWindow {
       ...(typeof params === "object" ? params : {}),
     } as AsyncWindowParams;
 
-    // max_size must breater then 1
+    // max_size must greater then 1
     this.params.max_size = Math.max(1, this.params.max_size);
   }
 
@@ -41,6 +44,11 @@ export class AsyncWindow {
     return this.queue.length;
   }
 
+  /**
+   * enter window
+   * @returns[0] leave window
+   * @returns[1] reset window timeout
+   */
   async enter(
     { on_pending, on_resume } = {} as {
       on_pending?: () => void;
@@ -86,9 +94,12 @@ export class AsyncWindow {
 export class AsyncWindowSpace {
   private windows = new Map<string, AsyncWindow>();
 
-  constructor(readonly DEF_KEY = "default") {}
+  constructor(
+    readonly DEF_KEY = "default",
+    readonly DEF_PARAMS = {} as Partial<AsyncWindowParams>
+  ) {}
 
-  ensure_window(key = this.DEF_KEY, params?: Partial<AsyncWindowParams>) {
+  ensure_window(key = this.DEF_KEY, params = this.DEF_PARAMS) {
     let window = this.windows.get(key);
     if (!window) {
       window = new AsyncWindow(params);
@@ -113,6 +124,11 @@ export class AsyncWindowSpace {
     return this.ensure_window(key).queue_size();
   }
 
+  /**
+   * enter window
+   * @returns[0] leave window
+   * @returns[1] reset window timeout
+   */
   async enter(
     key = this.DEF_KEY,
     { on_pending, on_resume } = {} as {

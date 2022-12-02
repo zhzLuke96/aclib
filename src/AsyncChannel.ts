@@ -1,7 +1,9 @@
 import { AsyncSignal } from "./AsyncSignal";
 
 class CloseError extends Error {
-  constructor(){super("channel is closed")}
+  constructor() {
+    super("channel is closed");
+  }
 }
 
 /**
@@ -35,6 +37,10 @@ export class AsyncChannel<T = unknown> {
 
   is_empty() {
     return this.buffer_queue.length === 0;
+  }
+
+  is_closed() {
+    return this._closed;
   }
 
   async send(val: T) {
