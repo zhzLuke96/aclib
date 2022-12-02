@@ -31,6 +31,10 @@
     "test:cover": "jest --coverage",
     "lint": "eslint . --ext .ts",
     "prepublishOnly": "yarn test && yarn build",
-    "pub-pkg": "npm publish --access public"
+    "pub": "npm publish"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   }
 }
